@@ -134,6 +134,8 @@
     closeBtn.textContent = '\u2715';
     closeBtn.addEventListener('click', () => {
       panel.style.display = 'none';
+      panel.hidden = true;
+      browser.storage.local.set({ panelHidden: true });
     });
     head.append(headTitle, closeBtn);
 
@@ -156,7 +158,7 @@
     cancelBtn.id = ID + '-cancel';
     cancelBtn.className = ID + '-btn';
     cancelBtn.title = 'Discard recording';
-    cancelBtn.textContent = '\u2715';
+    cancelBtn.textContent = 'Discard';
 
     bitrateSel = document.createElement('select');
     bitrateSel.id = ID + '-bitrate';
@@ -394,9 +396,22 @@
     ensureCaptureScript();
     browser.runtime.onMessage.addListener((msg) => {
       if (msg && msg.action === 'showPanel') {
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        const show = panel.hidden || panel.style.display === 'none';
+        panel.style.display = show ? 'block' : 'none';
+        panel.hidden = !show;
+        browser.storage.local.set({ panelHidden: !show });
       }
     });
+
+    browser.storage.local
+      .get('panelHidden')
+      .then((res) => {
+        if (res.panelHidden) {
+          panel.style.display = 'none';
+          panel.hidden = true;
+        }
+      })
+      .catch(() => {});
   }
 
   if (document.readyState === 'loading') {

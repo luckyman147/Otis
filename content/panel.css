@@ -1,3 +1,7 @@
+#ytmp3-panel[hidden] {
+  display: none !important;
+}
+
 #ytmp3-panel {
   position: fixed;
   top: 64px;
