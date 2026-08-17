@@ -356,9 +356,16 @@
 
     const filename = sanitize(recTitle) + ' [0s-' + fmtTag(duration) + '].mp3';
 
+    let binary = '';
+    const CHUNK = 0x8000;
+    for (let i = 0; i < full.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, full.subarray(i, i + CHUNK));
+    }
+    const url = 'data:audio/mpeg;base64,' + btoa(binary);
+
     setStatus('Saving ' + filename + '…');
     browser.runtime
-      .sendMessage({ action: 'saveMp3', data: full, filename })
+      .sendMessage({ action: 'saveMp3', url, filename })
       .then((resp) => {
         state = 'idle';
         setUI();
