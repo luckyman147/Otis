@@ -11,8 +11,10 @@
   let ctx = null;
   let srcNode = null;
   let procNode = null;
+  let hookedVideo = null;
   let rate = 0;
   let resampler = null;
+  let recording = false;
 
   function post(data) {
     data.source = SRC;
@@ -50,17 +52,7 @@
     post({ type: 'error', step, name: err && err.name, message: err && err.message });
   }
 
-  function start() {
-    if (ctx) {
-      post({ type: 'started', rate });
-      return;
-    }
-    const v = getVideo();
-    if (!v) {
-      reportError('video', { name: 'NotFoundError', message: 'No <video> element found on this page.' });
-      return;
-    }
-
+  function buildGraph(v) {
     try {
       try {
         ctx = new AudioContext({ sampleRate: FALLBACK_RATE });
@@ -69,8 +61,7 @@
       }
     } catch (e) {
       reportError('AudioContext', e);
-      cleanup();
-      return;
+      return false;
     }
 
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
@@ -79,26 +70,72 @@
       srcNode = ctx.createMediaElementSource(v);
     } catch (e) {
       reportError('createMediaElementSource', e);
-      cleanup();
-      return;
+      return false;
     }
 
     try {
       procNode = ctx.createScriptProcessor(4096, 2, 2);
-      procNode.onaudioprocess = onProcess;
-      srcNode.connect(procNode);
-      procNode.connect(ctx.destination);
     } catch (e) {
       reportError('graph', e);
-      cleanup();
-      return;
+      return false;
     }
 
+    hookedVideo = v;
     rate = ctx.sampleRate;
     if (SUPPORTED_RATES.indexOf(rate) === -1) {
       resampler = makeResampler(rate, FALLBACK_RATE);
       rate = FALLBACK_RATE;
     }
+    return true;
+  }
+
+  function destroyGraph() {
+    if (procNode) {
+      procNode.onaudioprocess = null;
+      try { procNode.disconnect(); } catch (e) {}
+    }
+    if (srcNode) {
+      try { srcNode.disconnect(); } catch (e) {}
+    }
+    if (ctx) ctx.close().catch(() => {});
+    ctx = null;
+    srcNode = null;
+    procNode = null;
+    hookedVideo = null;
+    rate = 0;
+    resampler = null;
+    recording = false;
+  }
+
+  function start() {
+    const v = getVideo();
+    if (!v) {
+      reportError('video', { name: 'NotFoundError', message: 'No <video> element found on this page.' });
+      return;
+    }
+
+    if (!recording) {
+      if (v !== hookedVideo) destroyGraph();
+      if (!ctx) {
+        if (!buildGraph(v)) {
+          destroyGraph();
+          return;
+        }
+      }
+      try {
+        srcNode.disconnect();
+        procNode.disconnect();
+        procNode.onaudioprocess = onProcess;
+        srcNode.connect(procNode);
+        procNode.connect(ctx.destination);
+        recording = true;
+      } catch (e) {
+        reportError('graph', e);
+        destroyGraph();
+        return;
+      }
+    }
+
     post({ type: 'started', rate });
   }
 
@@ -124,24 +161,18 @@
   }
 
   function stop() {
-    cleanup();
+    if (recording) {
+      if (procNode) procNode.onaudioprocess = null;
+      try {
+        if (srcNode) {
+          srcNode.disconnect();
+          if (ctx) srcNode.connect(ctx.destination);
+        }
+        if (procNode) procNode.disconnect();
+      } catch (e) {}
+      recording = false;
+    }
     post({ type: 'stopped' });
-  }
-
-  function cleanup() {
-    if (procNode) {
-      procNode.onaudioprocess = null;
-      try { procNode.disconnect(); } catch (e) {}
-    }
-    if (srcNode) {
-      try { srcNode.disconnect(); } catch (e) {}
-    }
-    if (ctx) ctx.close().catch(() => {});
-    ctx = null;
-    srcNode = null;
-    procNode = null;
-    rate = 0;
-    resampler = null;
   }
 
   window.addEventListener('message', (e) => {

@@ -23,6 +23,24 @@
   text-transform: uppercase;
   color: #aaa;
   border-bottom: 1px solid #2c2c2c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ytmp3-close {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.ytmp3-close:hover {
+  color: #fff;
 }
 
 .ytmp3-body {

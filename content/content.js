@@ -125,7 +125,17 @@
 
     const head = document.createElement('div');
     head.className = ID + '-head';
-    head.textContent = 'Otis \u00b7 YouTube \u2192 MP3';
+    const headTitle = document.createElement('span');
+    headTitle.textContent = 'Otis \u00b7 YouTube \u2192 MP3';
+    const closeBtn = document.createElement('button');
+    closeBtn.id = ID + '-close';
+    closeBtn.className = ID + '-close';
+    closeBtn.title = 'Hide panel (reopen via the toolbar button)';
+    closeBtn.textContent = '\u2715';
+    closeBtn.addEventListener('click', () => {
+      panel.style.display = 'none';
+    });
+    head.append(headTitle, closeBtn);
 
     const body = document.createElement('div');
     body.className = ID + '-body';
