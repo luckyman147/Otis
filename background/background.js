@@ -1,5 +1,7 @@
 'use strict';
 
+const browser = globalThis.browser || globalThis.chrome;
+
 browser.action.onClicked.addListener((tab) => {
   if (tab.id !== undefined) {
     browser.tabs.sendMessage(tab.id, { action: 'showPanel' }).catch(() => {});

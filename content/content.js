@@ -4,6 +4,8 @@
   if (window.__ytmp3) return;
   window.__ytmp3 = true;
 
+  const browser = globalThis.browser || globalThis.chrome;
+
   const OUT_RATE = 44100;
   const ID = 'ytmp3';
   const CAPTURE_SRC = 'ytmp3-capture';

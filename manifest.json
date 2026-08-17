@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Otis",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Otis records the audio of the current YouTube video and saves it as an MP3 file. Everything runs locally in your browser - no microphone, no servers.",
   "permissions": ["downloads", "storage"],
   "background": {
-    "scripts": ["background/background.js"]
+    "scripts": ["background/background.js"],
+    "service_worker": "background/background.js"
   },
   "content_scripts": [
     {
@@ -17,7 +18,10 @@
   ],
   "action": {
     "default_title": "Show/hide the YouTube MP3 recorder panel",
-    "default_icon": "icons/icon.svg"
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
   },
   "web_accessible_resources": [
     {
@@ -26,8 +30,10 @@
     }
   ],
   "icons": {
-    "48": "icons/icon.svg",
-    "96": "icons/icon.svg"
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "browser_specific_settings": {
     "gecko": {
