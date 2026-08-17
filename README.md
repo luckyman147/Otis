@@ -15,7 +15,7 @@ Everything runs locally in your browser - no microphone, no servers, no accounts
 
 1. Open `about:debugging` in Firefox
 2. Click **This Firefox** → **Load Temporary Add-on…**
-3. Select `otis-0.2.0.xpi` (from `web-ext-artifacts/`, or build your own)
+3. Select `otis-0.2.1.xpi` (from `web-ext-artifacts/`, or build your own)
 
 > Unsigned XPIs cannot be permanently installed on release Firefox.
 > For permanent install, either use Firefox Developer Edition with

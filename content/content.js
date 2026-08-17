@@ -229,8 +229,7 @@
     }
     if (video.paused) video.play().catch(() => {});
 
-    encoder = new lamejs.Mp3Encoder(2, OUT_RATE, Number(bitrateSel.value));
-    mp3Chunks = [];
+    resetEncoder();
     capturedVideo = video;
     recTitle = getTitle();
     recChannel = getChannel();
@@ -242,6 +241,11 @@
     setStatus('Starting capture…');
     window.postMessage({ source: 'ytmp3', action: 'start' }, '*');
     browser.runtime.sendMessage({ action: 'recording', on: true }).catch(() => {});
+    setTimeout(() => {
+      if (state === 'recording' && !encoder) {
+        setStatus('Capture did not start (see browser console for errors).', 'warn');
+      }
+    }, 5000);
   }
 
   function tick() {
@@ -340,7 +344,12 @@
     setUI();
     updateTimer();
     setStatus(
-      'Capture failed: ' + (m.name || 'Error') + (m.message ? ' - ' + m.message : '') + hint,
+      'Capture failed' +
+        (m.step ? ' at ' + m.step : '') +
+        ': ' +
+        (m.name || 'Error') +
+        (m.message ? ' - ' + m.message : '') +
+        hint,
       'warn'
     );
     browser.runtime.sendMessage({ action: 'recording', on: false }).catch(() => {});
@@ -353,6 +362,12 @@
     if (m.type === 'pcm') onPcm(m.data);
     else if (m.type === 'started') {
       if (state === 'recording') {
+        if (!encoder) {
+          const rate = m.rate && [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000].indexOf(m.rate) !== -1
+            ? m.rate
+            : OUT_RATE;
+          encoder = new lamejs.Mp3Encoder(2, rate, Number(bitrateSel.value));
+        }
         setStatus(
           capturedVideo && capturedVideo.mediaKeys
             ? 'Recording (DRM video - MP3 may be silent)…'
