@@ -31,6 +31,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ytmp3-head:active {
+  cursor: grabbing;
 }
 
 .ytmp3-close {

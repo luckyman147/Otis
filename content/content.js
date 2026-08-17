@@ -25,6 +25,11 @@
   let stopBtn = null;
   let cancelBtn = null;
   let bitrateSel = null;
+  let dragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragPanelLeft = 0;
+  let dragPanelTop = 0;
 
   function $(sel) {
     return document.querySelector(sel);
@@ -138,6 +143,7 @@
       browser.storage.local.set({ panelHidden: true });
     });
     head.append(headTitle, closeBtn);
+    head.addEventListener('mousedown', onDragStart);
 
     const body = document.createElement('div');
     body.className = ID + '-body';
@@ -205,6 +211,42 @@
   function setStatus(text, kind) {
     statusEl.textContent = text;
     statusEl.className = kind || '';
+  }
+
+  function onDragStart(e) {
+    if (e.button !== 0 || e.target.id === ID + '-close') return;
+    const rect = panel.getBoundingClientRect();
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    dragPanelLeft = rect.left;
+    dragPanelTop = rect.top;
+    panel.style.left = rect.left + 'px';
+    panel.style.top = rect.top + 'px';
+    panel.style.right = 'auto';
+    dragging = true;
+    e.preventDefault();
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+  }
+
+  function onDragMove(e) {
+    if (!dragging) return;
+    let x = dragPanelLeft + (e.clientX - dragStartX);
+    let y = dragPanelTop + (e.clientY - dragStartY);
+    x = Math.max(0, Math.min(x, window.innerWidth - panel.offsetWidth));
+    y = Math.max(0, Math.min(y, window.innerHeight - panel.offsetHeight));
+    panel.style.left = x + 'px';
+    panel.style.top = y + 'px';
+  }
+
+  function onDragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    browser.storage.local
+      .set({ panelPos: { left: panel.style.left, top: panel.style.top } })
+      .catch(() => {});
   }
 
   function setUI() {
@@ -409,6 +451,16 @@
         if (res.panelHidden) {
           panel.style.display = 'none';
           panel.hidden = true;
+        }
+      })
+      .catch(() => {});
+    browser.storage.local
+      .get('panelPos')
+      .then((res) => {
+        if (res.panelPos && res.panelPos.left && res.panelPos.top) {
+          panel.style.left = res.panelPos.left;
+          panel.style.top = res.panelPos.top;
+          panel.style.right = 'auto';
         }
       })
       .catch(() => {});
