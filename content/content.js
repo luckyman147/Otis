@@ -354,25 +354,26 @@
       return;
     }
 
-    const blob = new Blob([full], { type: 'audio/mpeg' });
     const filename = sanitize(recTitle) + ' [0s-' + fmtTag(duration) + '].mp3';
 
     setStatus('Saving ' + filename + '…');
     browser.runtime
-      .sendMessage({ action: 'saveMp3', blob, filename })
+      .sendMessage({ action: 'saveMp3', data: full, filename })
       .then((resp) => {
         state = 'idle';
         setUI();
         updateTimer();
-        setStatus(
-          resp && resp.ok ? 'Saved: ' + filename : 'Save failed.',
-          resp && resp.ok ? 'ok' : 'warn'
-        );
+        if (resp && resp.ok) {
+          setStatus('Saved: ' + filename, 'ok');
+        } else {
+          const err = resp && resp.error ? String(resp.error).slice(0, 120) : '';
+          setStatus('Save failed' + (err ? ' - ' + err : '') + '.', 'warn');
+        }
       })
-      .catch(() => {
+      .catch((e) => {
         state = 'idle';
         setUI();
-        setStatus('Save failed.', 'warn');
+        setStatus('Save failed - ' + String(e).slice(0, 120), 'warn');
       });
     browser.runtime.sendMessage({ action: 'recording', on: false }).catch(() => {});
   }

@@ -13,7 +13,8 @@ browser.runtime.onMessage.addListener(async (msg) => {
 
   if (msg.action === 'saveMp3') {
     try {
-      const url = URL.createObjectURL(msg.blob);
+      const blob = new Blob([msg.data], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
       const id = await browser.downloads.download({
         url,
         filename: msg.filename,
