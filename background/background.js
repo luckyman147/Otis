@@ -13,14 +13,25 @@ browser.runtime.onMessage.addListener(async (msg) => {
 
   if (msg.action === 'saveMp3') {
     try {
-      const blob = new Blob([msg.data], { type: 'audio/mpeg' });
-      const url = URL.createObjectURL(blob);
+      const bytes = msg.data;
+      let url;
+      if (typeof URL.createObjectURL === 'function') {
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        url = URL.createObjectURL(blob);
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      } else {
+        let binary = '';
+        const CHUNK = 0x8000;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+        }
+        url = 'data:audio/mpeg;base64,' + btoa(binary);
+      }
       const id = await browser.downloads.download({
         url,
         filename: msg.filename,
         saveAs: false
       });
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
       return { ok: true, id };
     } catch (e) {
       return { ok: false, error: String(e) };
