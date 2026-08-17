@@ -1,0 +1,94 @@
+#ytmp3-panel {
+  position: fixed;
+  top: 64px;
+  right: 12px;
+  z-index: 2147483647;
+  width: 260px;
+  background: #1c1c1c;
+  color: #eee;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.ytmp3-head {
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #aaa;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+.ytmp3-body {
+  padding: 10px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ytmp3-btn {
+  background: #2a2a2a;
+  color: #eee;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ytmp3-btn:hover:not(:disabled) {
+  background: #383838;
+}
+
+.ytmp3-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ytmp3-primary {
+  background: #e62117;
+  border-color: #e62117;
+  color: #fff;
+}
+
+.ytmp3-primary:hover:not(:disabled) {
+  background: #f00;
+}
+
+#ytmp3-bitrate {
+  background: #2a2a2a;
+  color: #eee;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 5px;
+  font-size: 12px;
+}
+
+.ytmp3-status {
+  padding: 0 12px 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #999;
+  font-size: 12px;
+}
+
+#ytmp3-status.warn {
+  color: #ffa726;
+}
+
+#ytmp3-status.ok {
+  color: #7cb342;
+}
+
+#ytmp3-timer {
+  font-variant-numeric: tabular-nums;
+  color: #eee;
+}
