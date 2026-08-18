@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Otis",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Otis records the audio of the current YouTube video and saves it as an MP3 file. Everything runs locally in your browser - no microphone, no servers.",
   "permissions": ["downloads", "storage"],
   "background": {

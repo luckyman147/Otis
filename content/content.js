@@ -132,8 +132,13 @@
 
     const head = document.createElement('div');
     head.className = ID + '-head';
+    const headIcon = document.createElement('span');
+    headIcon.className = ID + '-icon';
+    headIcon.innerHTML =
+      '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 18.5a3 3 0 1 1-2-2.83V6.07a1 1 0 0 1 .76-.97l9-2.25A1 1 0 0 1 18 3.82v11.35a3 3 0 1 1-2-2.83V8.26l-7 1.75v8.49Z"/></svg>';
     const headTitle = document.createElement('span');
-    headTitle.textContent = 'Otis \u00b7 YouTube \u2192 MP3';
+    headTitle.id = ID + '-title';
+    headTitle.textContent = 'OTIS';
     const closeBtn = document.createElement('button');
     closeBtn.id = ID + '-close';
     closeBtn.className = ID + '-close';
@@ -144,7 +149,7 @@
       panel.hidden = true;
       browser.storage.local.set({ panelHidden: true });
     });
-    head.append(headTitle, closeBtn);
+    head.append(headIcon, headTitle, closeBtn);
     head.addEventListener('mousedown', onDragStart);
 
     const body = document.createElement('div');
@@ -158,13 +163,13 @@
 
     stopBtn = document.createElement('button');
     stopBtn.id = ID + '-stop';
-    stopBtn.className = ID + '-btn';
+    stopBtn.className = ID + '-btn ' + ID + '-stop';
     stopBtn.title = 'Stop and save as MP3';
     stopBtn.textContent = '\u25A0 Stop & Save';
 
     cancelBtn = document.createElement('button');
     cancelBtn.id = ID + '-cancel';
-    cancelBtn.className = ID + '-btn';
+    cancelBtn.className = ID + '-btn ' + ID + '-ghost';
     cancelBtn.title = 'Discard recording';
     cancelBtn.textContent = 'Discard';
 
@@ -188,7 +193,10 @@
     timerEl.id = ID + '-timer';
     timerEl.textContent = '0:00';
 
-    body.append(recordBtn, stopBtn, cancelBtn, bitrateSel);
+    const controls = document.createElement('div');
+    controls.className = ID + '-controls';
+    controls.append(recordBtn, stopBtn, cancelBtn, bitrateSel);
+    body.append(controls);
     statusRow.append(statusEl, timerEl);
     panel.append(head, body, statusRow);
     document.documentElement.appendChild(panel);
